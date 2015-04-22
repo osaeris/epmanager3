@@ -1,0 +1,2 @@
+
+INSERT INTO `joebloggs_terms` VALUES (1,'ePortfolio awaiting category','eportfolio-awaiting-category',0),(2,'career opportunities','career-opportunities',0),(3,'citizenship, employability and enterprise','citizenship-employability-and-enterprise',0),(4,'ILP','ilp',0),(5,'journal','journal',0),(6,'self appraisal','self-appraisal',0),(7,'tutorial records','tutorial-records',0),(8,'where am i now?','where-am-i-now',0);

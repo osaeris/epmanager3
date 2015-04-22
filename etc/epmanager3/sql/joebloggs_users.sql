@@ -1,0 +1,1 @@
+INSERT INTO `joebloggs_users` VALUES (1,'joebloggs','$P$BS5R802h7oPZQ4LFvu3E8XcOfCxQ53.','unknown','STUDENTEMAIL','','2014-01-14 16:02:58','',0,'joebloggs'),(2,'lecturer','9eb39bbabf8750a191aee49d73416093','lecturer','LECTUREREMAIL','','2014-01-15 15:06:17','',0,'firstname surname');

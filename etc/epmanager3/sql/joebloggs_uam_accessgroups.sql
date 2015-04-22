@@ -1,0 +1,1 @@
+INSERT INTO `joebloggs_uam_accessgroups` VALUES (1,'Lecturers','The eportfolio lecturers group for participation in ePortfolio','group','group',''),(2,'Students','The eportfolio students group for posting','group','group','');

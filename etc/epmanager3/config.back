@@ -1,0 +1,43 @@
+<?php
+// Version
+define('EP_VERSION', '21042015-01'); //ddmmyy-ver
+
+// Crucial settings - These are crucial and must be filled in before running installer 
+
+define('EP_DB_SERVER', 'localhost');// the server with epmanager mysql database
+define('EP_DB_DATABASE', 'eportfolio');// the live epmanager database
+define('EP_DB_USERNAME', 'root');// the epmanager database username
+define('EP_DB_PASSWORD', 'root');// the epmanager database password
+
+// Basic settings - These are crucial but can be edited anytime BEFORE creating ePortfolios 
+
+define('INTERNET_ROOT', 'www.yourdomain.com/epmanager'); // URL of the base manager
+define('INTERNET_EPROOT', 'www.yourdomain.com/eportfolios'); // URL used throughout Wordpress
+define('INTERNET_EPSECURE', 'off'); //Use on for https login
+define('LOCAL_PATH', '/usr/share/epmanager/');// This is needed because files are copied and deleted
+define('PORTFOLIO_PATH', '/var/www/eportfolios/');// Portfolios may be mounted elsewhere
+define('INTERNET_DOMAIN', 'yourdomain.com');// Domain for default lecturer email address
+define('LECTURER_PASS', 'defaultpass');// Default lecturer password (default is lecturer)
+
+// Student Records Database Settings - These are entirely optional 
+
+define('MIS_INTEGRATION', 'off');//  For MIS integration features - change to 'on' or off
+
+define('MIS_SYSTEM', 'sits');//  Choose MIS System
+define('MIS_DBMS', 'mssql');//  Choose DBMS System your MIS runs on
+// If you state true to MIS_INTEGRATION, Set up a connection to your MIS system 
+
+define('STUDENT_DB_SERVER', 'ipaddress');// the server with student records system (eg 192.168.0.50)
+define('STUDENT_DB_DATABASE', 'databasename');// the student records database
+define('STUDENT_DB_USERNAME', 'databaseuser');// the student records database user
+define('STUDENT_DB_PASSWORD', 'databasepassword');// the student records database user password
+
+// LDAP authentication for Wordpress installs (optional)
+define('EP_LDAP_INTEGRATION', 'off');// should LDAP authentication be used?
+define('EP_LDAP_SERVER', 'ldapnameorip');// the LDAP server (eg 192.168.0.10 or machine.domain.com)
+define('EP_LDAP_PORT', 'ldapport');// the LDAP port (eg 389)
+define('EP_LDAP_SEARCHDN', 'ldapsearchdn');// the Search DN should be a domain user with read permission on directory (maybe use LDP in Windows XP to explore your AD)
+define('EP_LDAP_SEARCHPWD', 'ldapsearchpassword');// the Search DNs password
+define('EP_LDAP_SEARCHROOT', 'ldaproot');// the root to search from in the directory
+
+?>

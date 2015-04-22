@@ -1,0 +1,24 @@
+EPManager TODO List
+
+* User Management (logged in)
+
+  - View all users with status
+  - email new password if forgotten
+
+* Form accessibility (use accesskeys where appropriate
+
+* Settings Page (logged in)
+
+  Test SQL connections (local and CMIS)
+    - provide check connection buttons next to each set of settings
+
+* Code cleanup
+
+  - Remove all extraneous code including commented debugging information
+  - Remove Array echoes from form posts
+  - Strict XHTML
+
+* Graphics
+  
+  - <li> decorations
+  
