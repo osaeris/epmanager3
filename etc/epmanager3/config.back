@@ -32,12 +32,4 @@ define('STUDENT_DB_DATABASE', 'databasename');// the student records database
 define('STUDENT_DB_USERNAME', 'databaseuser');// the student records database user
 define('STUDENT_DB_PASSWORD', 'databasepassword');// the student records database user password
 
-// LDAP authentication for Wordpress installs (optional)
-define('EP_LDAP_INTEGRATION', 'off');// should LDAP authentication be used?
-define('EP_LDAP_SERVER', 'ldapnameorip');// the LDAP server (eg 192.168.0.10 or machine.domain.com)
-define('EP_LDAP_PORT', 'ldapport');// the LDAP port (eg 389)
-define('EP_LDAP_SEARCHDN', 'ldapsearchdn');// the Search DN should be a domain user with read permission on directory (maybe use LDP in Windows XP to explore your AD)
-define('EP_LDAP_SEARCHPWD', 'ldapsearchpassword');// the Search DNs password
-define('EP_LDAP_SEARCHROOT', 'ldaproot');// the root to search from in the directory
-
 ?>
