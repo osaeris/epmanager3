@@ -1260,34 +1260,47 @@
   function make_single_backup($student) {
   //make a single .sql file in the temp directory
  
-     $backupFile = '/tmp/'. $student .'.sql';
-     if (file_exists($backupFile))
-       unlink ($backupFile);
+      $backupFile = '/tmp/'. $student .'.sql';
+      if (file_exists($backupFile)) {
+          unlink ($backupFile);
+      }
 
-     $command = "mysqldump -u ".EP_DB_USERNAME." -p".EP_DB_PASSWORD." ".EP_DB_DATABASE." {$student}_commentmeta {$student}_comments {$student}_links {$student}_options {$student}_postmeta {$student}_posts {$student}_terms {$student}_term_relationships {$student}_term_taxonomy {$student}_uam_accessgroups {$student}_uam_accessgroup_to_object {$student}_usermeta {$student}_users > $backupFile";
+          $command = "mysqldump -u ".EP_DB_USERNAME." -p".EP_DB_PASSWORD." ".EP_DB_DATABASE." {$student}_commentmeta {$student}_comments {$student}_options {$student}_postmeta {$student}_posts {$student}_terms {$student}_term_relationships {$student}_term_taxonomy {$student}_uam_accessgroups {$student}_uam_accessgroup_to_object {$student}_usermeta {$student}_users > $backupFile";
+          system($command);
 
-     system($command);
+          $eproot=INTERNET_EPROOT;
+          $eproot=str_replace("/","\/",$eproot);
+          $portfoliopath=PORTFOLIO_PATH;
+          $portfoliopath=str_replace("/","\/",$portfoliopath);
+          exec('cat /tmp/'.$student.'.sql | sed "{ 
+              s/'.$eproot.'/interneteproot/g      
+              s/'.$student.'@'.INTERNET_DOMAIN.'/STUDENTEMAIL/g 
+              s/'.$portfoliopath.'/portfoliopath/g 
+          }" > /tmp/'.$student.'.sql.back');
      
-     $archive_target="/tmp/epmanagerbackup/epmanager_".$student.".zip";
-     $archive_source=PORTFOLIO_PATH.'/'.$student;    
+          $command="cp /tmp/$student.sql.back $backupFile";
+          system($command);
+     
+          $archive_target="/tmp/epmanagerbackup/epmanager_".$student.".zip";
+          $archive_source=PORTFOLIO_PATH.'/'.$student;    
   
-     if (file_exists($archive_target))
-       unlink ($archive_target);
+          if (file_exists($archive_target)) {
+              unlink ($archive_target);
+          }
 
-     $archive = new PclZip($archive_target);
-     chmod ($backupFile, 0777);
+          $archive = new PclZip($archive_target);
+          chmod ($backupFile, 0777);
 
-     $v_list = $archive->add($archive_source,PCLZIP_OPT_REMOVE_PATH,PORTFOLIO_PATH);
-     $v_list = $archive->add($backupFile,PCLZIP_OPT_REMOVE_PATH,'tmp'); 
+          $v_list = $archive->add($archive_source,PCLZIP_OPT_REMOVE_PATH,PORTFOLIO_PATH);
+          $v_list = $archive->add($backupFile,PCLZIP_OPT_REMOVE_PATH,'tmp'); 
 
-     if ($v_list == 0) {
-       die("Error : ".$archive->errorInfo(true));
-     }
+          if ($v_list == 0) {
+              die("Error : ".$archive->errorInfo(true));
+          }
    
-     if (file_exists($backupFile)) {
-       unlink ($backupFile);
-     }     
-  
+          if (file_exists($backupFile)) {
+              unlink ($backupFile);
+          }     
   }
 
 
