@@ -12,3 +12,7 @@ One of the concerns at the beginning of the ISLE project was persistence of the 
 Single Sign On
 --------------
 Developers should refer to the contents of wp-content/plug3-singlesignonlink.php in an eportfolio to set up single sign on.
+
+Issues
+-------
+The HTML Export is currently being re-developed so isn't working yet.
