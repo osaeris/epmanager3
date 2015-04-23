@@ -1,0 +1,133 @@
+Introduction
+
+Some pre-requisites exist. You need to have a working LAMP setup so install MySQL, php5, apache2.
+
+You should have a fixed IP address or dedicated domain name to use. Your EPManager will appear at http://yourdomain/epmanager and eportfolios at http://yourdomain/eportfolios although these can be changed later.
+Installation
+
+Instructions for linux server in this case Ubuntu Lucid Lynx
+
+Clone the epmanager3 repository
+
+$ git clone https://github.com/osaeris/epmanager3.git epmanager3
+
+Copy to the relevant directories:
+
+$ sudo cp eportfoliomanagernoldap/etc/epmanager3 /etc/ -R
+
+$ sudo cp eportfoliomanagernoldap/usr/share/epmanager3 /usr/share/ -R
+
+Create a link in /var/www to epmanager3
+
+$ sudo ln -s /usr/share/epmanager3 /var/www/epmanager3
+
+Create a directory for eportfolios which should be writable by the web server
+
+$ sudo mkdir /var/www/eportfolios
+
+$ chgrp www-data /var/www/eportfolios
+$ chmod g+w /var/www/eportfolios
+
+Create a database called epmanager3 along with a new username and password to access the database
+
+mysql> CREATE DATABASE `epmanager3` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+
+Edit your config.back file to reflect these changes and save as config.php
+
+$ sudo nano /etc/epmanager/config.back
+
+define('EP_DB_SERVER', 'localhost');// the server with epmanager mysql database
+define('EP_DB_DATABASE', 'eportfolio');// the live epmanager database
+define('EP_DB_USERNAME', 'eportfoliouser');// the epmanager database username
+define('EP_DB_PASSWORD', 'YOURPASSWORD');// the epmanager database password
+
+Save as /etc/epmanager/config.php and make file writable temporarily (You can leave it writable in order to make future changes through web interface)
+
+$ sudo chmod 777 /etc/epmanager/config.php
+
+Now visit the installer page and follow the instructions
+
+http://yourdomain/epmanager/install.php
+
+Your EPManager install is now complete. You should proceed to log in as admin, password admin then change your admin password and head to the SETTINGS page to set up the rest of your options.
+
+Setting up Single Sign On
+
+This is a rather more complex matter than installation. Each of the created eportfolios have the ability to single sign on if supplied with correct credentials via URL. in order to use this from a remote system the remote system must have access to the EP_SSO_SALT value from /etc/epmanager/config.php you can either copy this value to the code on the remote server or just include /etc/epmanager/config.php if on the same machine as you provide the sso link.
+
+Moodle example code
+
+Here is an example code block for Moodle which will generate a single sign on link:
+
+    require_once($CFG->dirroot .'/config.php');
+    require_once($CFG->dirroot .'/course/lib.php');
+    require_once($CFG->dirroot .'/lib/blocklib.php');
+
+    $currentuser = $USER->username; //get the current user
+    $currentuser = strtolower($currentuser);
+    $datecheck=date('dMyh');
+
+    if(file_exists("/etc/epmanager/config.php")) {
+       // if epmanager config is not set up there will be no SSO 
+       include("/etc/epmanager/config.php");
+       $oktosso='true';
+    }
+    else
+    {
+       // if epmanager is not installed there will be no salt to hash against!
+       $oktosso='false';
+    }
+
+    $expectedhash=md5($currentuser . $datecheck . EP_SSO_SALT);
+
+    $html .="Your ePortfolio is <a href='http://yourdomain/eportfolios/{$currentuser}/wp-login.php?login={$currentuser}&amp;hash={$expectedhash}' target='_blank'>here</a></li>\n\r";
+
+    echo $html;
+
+ASP.NET example SSO code
+
+You may need to make a few minor changes to this as I haven't tested it.
+
+<%@ import Namespace="System.DirectoryServices" %>
+<%@ import Namespace="System" %>
+<%@ import Namespace="System.Web" %>
+<%@ import Namespace="System.Security" %>
+<%@ import Namespace="System.Threading" %>
+<%@ import Namespace="System.Security.Principal" %>
+<%@ import Namespace="System.Security.Permissions" %>
+
+<script runat="server">
+
+DIM domain_name AS String = "YOURADDOMAIN"
+DIM username as String
+DIM userhash as String
+
+Dim strHash as String
+Dim strFormat as String = "MD5"
+Dim Currentdate as String
+Dim EP_SSO_SALT as String
+
+Sub Page_Load()
+
+    EP_SSO_SALT="my really long salt value"
+    Currentdate = DateTime.Now.ToString("ddMMyyHH")
+    AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal)
+
+    Dim MyIdentity As WindowsIdentity = WindowsIdentity.GetCurrent()
+    Dim MyPrincipal As New WindowsPrincipal(MyIdentity)
+    Dim IdentName As String = MyIdentity.Name
+
+    username = MID(IdentName, LEN(domain_name)+2, LEN(IdentName))
+    username = username.ToString().ToLower()
+    strHash =  FormsAuthentication.HashPasswordForStoringInConfigFile(username & CurrentDate & EP_SSO_SALT,strFormat)
+    strHash = strHash.ToString().ToLower()
+'   response.write(username & "<br />" & strHash & "<br />" & Currentdate)
+    response.redirect("http://YOURDOMAIN/eportfolios/" & username & "?login=" & username & "&hash=" & strHash)
+      
+End Sub
+
+</script> 
+
+Troubleshooting
+
+If the install.php fails it will tell you why. It's almost always because of permissions (either the database username and password are wrong or config.php isn't writable) 
