@@ -15,6 +15,8 @@ Developers should refer to the contents of wp-content/plug3-singlesignonlink.php
 
 Issues
 -------
+Importing and Exporting Does not work yet.
+
 The HTML Export has just been fixed
 
-Still testing import and export 
+
