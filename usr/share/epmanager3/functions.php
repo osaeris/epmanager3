@@ -1399,12 +1399,19 @@
 
   full_copy("/tmp/$oldstudent",PORTFOLIO_PATH.'/'.$student);
   $query_target="/tmp/temp.sql";
-
-      exec('cat /tmp/'.$oldstudent.'.sql | sed "{ 
-
-        s/'.$oldstudent.'/'.$student.'/g 
-
-      }" > /tmp/temp.sql');
+  
+          $eproot=INTERNET_EPROOT;
+          $eproot=str_replace("/","\/",$eproot);
+          $portfoliopath=PORTFOLIO_PATH;
+          $portfoliopath=str_replace("/","\/",$portfoliopath);
+          exec('cat /tmp/'.$oldstudent.'.sql | sed "{ 
+              s/'.$oldstudent.'/'.$student.'/g     
+              s/interneteproot/'.$eproot.'/g      
+              s/STUDENTEMAIL/'.$student.'@'.INTERNET_DOMAIN.'/g 
+              s/portfoliopath/'.$portfoliopath.'/g 
+          }" > /tmp/temp.sql.back');  
+          $command="cp /tmp/temp.sql.back /tmp/temp.sql";
+          system($command);
 
 
     $uploadspath=PORTFOLIO_PATH.'/'.$student."/wp-content/uploads";
