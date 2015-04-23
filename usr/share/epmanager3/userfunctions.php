@@ -376,17 +376,18 @@ $posttitle='';
 }
 
 function get_cat_name($categoryid,$student) {
+
 //this function will simply return
 //the category name of a post by cat id 
 
 /*local variables*/
 $catname='';
 
-        $query = 'SELECT cat_name FROM '. $student .'_categories WHERE cat_ID = '.$categoryid.';';
+        $query = 'SELECT name FROM '. $student .'_terms WHERE term_id = '.$categoryid.';';
 
         $link=dbconnect();
         $result=mysqli_query($link,$query);
-        $catname=mysqli_result($result,0,"cat_name");
+        $catname=mysqli_result($result,0,"name");
         dbdisconnect($link);
  
 
@@ -481,7 +482,7 @@ all comments which are approved for a post id
 
         $link=dbconnect();
         $result=mysqli_query($link,$query);
-        $num=mysqli_numrows($result);
+        $num=mysqli_num_rows($result);
 
         $commentarray[0][0]=$num;
 
@@ -677,15 +678,15 @@ function check_attachment($id,$userid) {
 //if the post describes a file attachment
 
     $link=dbconnect();
-    $query = 'SELECT post_status FROM '. $userid .'_posts WHERE ID = '.$id.' LIMIT 1;';
+    $query = "SELECT post_type FROM {$userid}_posts WHERE ID = $id and post_type='attachment' LIMIT 1;";
 
     $result=mysqli_query($link,$query);
 
-    $poststatus=mysqli_result($result,0,"post_status");
+    $posttype=mysqli_result($result,0,"post_type");
 
     dbdisconnect($link);
 
-    if($poststatus=='attachment') {
+    if($posttype=='attachment') {
         return true;
     }
     else
@@ -834,6 +835,25 @@ function get_current_session_long_format() {
       return $numstudent[0];
 
 
+    }
+    
+    function get_post_category($postid,$student) {
+          $link=dbconnect();
+
+         $query = "SELECT term_taxonomy_id, name from $student" . "_term_relationships ";
+         $query .= "JOIN $student" . "_terms on $student" . "_terms.term_id = $student" . "_term_relationships.term_taxonomy_id ";
+         $query .= " WHERE object_id=$postid limit 1; ";
+//echo $query . "<br />";
+         $numstudents = mysqli_query($link,$query) or die("Select get_post_category Failed!");
+         $numstudent = mysqli_fetch_array($numstudents);
+
+         dbdisconnect($link);
+
+         
+        return $numstudent;
+     
+    
+    
     }
 
     function get_child_count($postid,$student) {

@@ -148,8 +148,10 @@ function html_export($student) {
         mkdir("/tmp/" . $student . "/files");
     }
 
+    $menudiv=get_html_export_menu($student);
+    
     $link=dbconnect();
-    $query = 'SELECT * from '. $student .'_post2cat ORDER BY category_id, post_id ASC;';
+    $query = 'SELECT * from '. $student .'_posts;';
 
     $result=mysqli_query($link,$query);
     $count = mysqli_num_rows($result);
@@ -161,135 +163,41 @@ function html_export($student) {
     }
     else
     {
-     //loop through the resources creating a menu div to place in each html file
+        $attachmentcount=0;
+        $postcount=0;
+        
+        while( $row=mysqli_fetch_assoc($result) ) {
+                    
+            $postcount++;
+            $postid= $row["ID"];
+            $postcategoryarray=get_post_category($postid,$student);
 
-
-     while( $row=mysqli_fetch_assoc($result) ) { 
-           $postcount++;
-           $categoryid = $row["category_id"];
-           $categoryname = get_cat_name($categoryid,$student);
-           $postid= $row["post_id"];
-           $postguid = get_post_guid($postid,$student);
-
-           if (check_attachment($postid,$student)==true) {
-
-               $posttitle=get_post_title($postid,$student);  //title of wordpress post
-               if($posttitle=='') {
-                   $posttitle='unknown';
-               }
-               $attachmentpath=get_attachment_path($postid,$student); //path to the attachment in uploads
-               $producttarget='files/' . basename($attachmentpath); //target for the location of the file in your zip
-
-
-
-
-               $menuarray[$postcount][0]=99;             //0 = a file
-               $menuarray[$postcount][1]="my files"; //1 = categoryname
-               $menuarray[$postcount][2]=$posttitle;    //2 = post title
-               $menuarray[$postcount][3]=$producttarget;//3 = post link
-               $menuarray[$postcount][4]=$postcount;    //4 = post count
-           }
-           else
-           {         
-               //This is a post so we need a postID.htm file and a productID.xml file
-               //and to add these into the tree there's HTML in the posts so it's
-               //not practical to store that as xml. Easier just to make an HTML
-               //file with the contents of the post and refer to it.
-
-               //Create a resource file .htm with the post_content
-               $posttitle=get_post_title($postid,$student);
-               if($posttitle=='') {
-                   $posttitle='unknown';
-               }
-               //this just copies the functionality from html_create file function
-               //to save creating the files twice just to get their name
-               $filetitle = ereg_replace('[^A-Za-z0-9]', '_', $posttitle );
-               $filetitle = str_replace('.', '', $filetitle );
-               $filename = $postid . "_" . $filetitle;
-
-               $diskfile = $filename . '.html'; // a new filename comes back for the menu
-
-               $menuarray[$postcount][0]=$categoryid;   //0 = category id
-               $menuarray[$postcount][1]=$categoryname; //1 = categoryname
-               $menuarray[$postcount][2]=$posttitle;    //2 = post title
-               $menuarray[$postcount][3]=$diskfile;     //3 = post link
-               $menuarray[$postcount][4]=$postcount;    //4 = post count
-
+            if(count($postcategoryarray)>0) {
+                $categoryid=(int)$postcategoryarray[0];
+                $categoryname=$postcategoryarray[1];
             }
-        }
-            sort($menuarray);
-            $previouscategory="999";
-  
-            //now build the menu div
-            $menudiv = "    <div id='menu'>\r\n";
-                        $firstrecordpast==false;
+            else
+            {
+                $categoryid=1;
+                $categoryname='ePortfolio awaiting category';                   
+            }
+             
+            $postdate = get_post_date($postid,$student);
+            $postguid = get_post_guid($postid,$student);
 
-            $menudiv .= "  <h3>menu</h3>          <ul><li><a href='index.html'>home</a></li></ul>\r\n";   
+            if (check_attachment($postid,$student)==true) {
+                $attachmentcount++;
+                //if it's an attachment (i.e. a file like a photo or audio file) we need to copy the file
+                //into the temp directory 
+                $posttitle=get_post_title($postid,$student);  //title of wordpress post
+                $attachmentpath=PORTFOLIO_PATH . '/' . $student . '/wp-content/uploads/'. get_attachment_path($postid,$student); //path to the attachment in uploads
+                $attachtarget="/tmp/". $student . "/files/" . basename($attachmentpath); // temp copy target for posted file
+                $producttarget='files/' . basename($attachmentpath); //target for the location of the file in your zip
 
-            for ($x=1;$x<count($menuarray);$x++) {
-                $currentcategory=$menuarray[$x][0];
-                $currentcatname=$menuarray[$x][1];
-                $currentposttitle=$menuarray[$x][2];
-                $currentlink=$menuarray[$x][3];
-                $currentcount=$menuarray[$x][4];
+                full_copy($attachmentpath,$attachtarget);
 
-                    if($currentcategory!=$previouscategory) {
-                       if($firstrecordpast==true) {
-                        $menudiv .= "            </ul>\r\n";   
-                       }
-                        $menudiv .= "            <h3>".$currentcatname."</h3>\r\n";     
-                        $menudiv .= "            <ul>\r\n";     
-                    }
-
-                $firstrecordpast=true;
-                $menudiv .= "            <li><a href='".$currentlink."'>".$currentposttitle."</a></li>\r\n";  
-
-             $previouscategory=$menuarray[$x][0];
-             }
-
-             $menudiv .= "        </ul>\r\n";
-             $menudiv .= "    </div>\r\n";
-
-
-    $link=dbconnect();
-    $query = 'SELECT * from '. $student .'_post2cat ORDER BY category_id, post_id ASC;';
-
-    $result=mysqli_query($link,$query);
-    $count = mysqli_num_rows($result);
-
-    dbdisconnect($link);
-
-       //loop through the resources creating xhtml files and entries in the menu 
-       //theres a relationship id which carries to each record allowing sets of
-       //comments to be included in one html file
-       $attachmentcount=0;//carry the total                $menuarray[$postcount][0]=$categoryid;   //0 = category id
-       $postcount=0;//follow the number of posts used to populate menu as well
-
-        while( $row=mysqli_fetch_assoc($result) ) { 
-           $postcount++;
-           $categoryid = $row["category_id"];
-           $categoryname = get_cat_name($categoryid,$student);
-
-           $postid= $row["post_id"];
-           $postdate = get_post_date($postid,$student);
-           $postguid = get_post_guid($postid,$student);
-
-           if (check_attachment($postid,$student)==true) {
-               $attachmentcount++;
-           //if it's an attachment (i.e. a file like a photo or audio file) we need to copy the file
-           //into the temp directory 
-               $posttitle=get_post_title($postid,$student);  //title of wordpress post
-               $attachmentpath=get_attachment_path($postid,$student); //path to the attachment in uploads
-               $attachtarget="/tmp/". $student . "/files/" . basename($attachmentpath); // temp copy target for posted file
-               $producttarget='files/' . basename($attachmentpath); //target for the location of the file in your zip
-
-               full_copy($attachmentpath,$attachtarget);
-
-               $attachmentarray[$attachmentcount][0]=$postguid;
-               $attachmentarray[$attachmentcount][1]=$producttarget;
-
-
-
+                $attachmentarray[$attachmentcount][0]=$postguid;
+                $attachmentarray[$attachmentcount][1]=$producttarget;
            }
            else
            {
@@ -303,13 +211,8 @@ function html_export($student) {
                if($posttitle=='') {
                    $posttitle='unknown';
                }
-
-
-
-
-
+               
                if (post_has_comments($postid,$student)==true) {
-                 
 
                    //get an array of comments to work on
                    $comments=get_comments_array($postid,$student);
@@ -324,94 +227,208 @@ function html_export($student) {
                    $nocomments=$comments[0][0];
 
                    if($nocomments>0) { //it should be !
-                      $commentstring = "<p><b>comments:</b></p>\n\r";
+                       $commentstring = "<p><b>comments:</b></p>\n\r";
                        $test=1;
                        while($test < $nocomments+1) {
 
-                         $commentid=$comments[$test][0];
-                         $commentauthor=$comments[$test][1];
-                         $commentdate=$comments[$test][2];
-                         $commentcontent=$comments[$test][3];
+                          $commentid=$comments[$test][0];
+                          $commentauthor=$comments[$test][1];
+                          $commentdate=$comments[$test][2];
+                          $commentcontent=$comments[$test][3];
 
-                         $commentstring .= "<hr />\n\r";
-                         $commentstring .= "<p>Comment by: <b>" . $commentauthor . "</b> on <b>" . $commentdate . "</b><br />\n\r";
-                         $commentstring .= $commentcontent;
-                         $commentstring .= "</p>\n\r";
+                          $commentstring .= "<hr />\n\r";
+                          $commentstring .= "<p>Comment by: <b>" . $commentauthor . "</b> on <b>" .  $commentdate . "</b><br />\n\r";
+                          $commentstring .= $commentcontent;
+                          $commentstring .= "</p>\n\r";
 
-                         $test++;
-                      }
-                      $commentstring .= "\n\r";
-                   }
-               }
-               else
-               {
-                   $commentstring="";//reset the comments string
-               }
+                          $test++;
+                       }
+                       $commentstring .= "\n\r";
+                    }
+                }
+                else
+                {
+                    $commentstring="";//reset the comments string
+                }
+               
+                for($x=1;$x<$attachmentcount+1;$x++) {
+                    $postcontent=str_replace($attachmentarray[$x][0],$attachmentarray[$x][1],$postcontent);
+                }               
+               
+            //let's create an xHTML page if possible
+            $postcontent=get_html_header($student);
+            $postcontent.=$menudiv;
+            $postcontent.="<h1>" . $posttitle . "</h1>\r\n";
+            $postcontent.=get_post_content($postid,$student);//get the HTML out of the post
+            $postcontent.="<div id='comments'>" . $commentstring . "</div>\r\n";//get the HTML out of the post
+            $postcontent.=get_html_footer();
 
+            $filename = html_create_html_file($student,$postid,$postcontent,$posttitle); //create an HTML file of post content    
+               
+            //create an index / welcome page
 
-               for($x=1;$x<$attachmentcount+1;$x++) {
-                     $postcontent=str_replace($attachmentarray[$x][0],$attachmentarray[$x][1],$postcontent);
-               }
-
-               //let's create an xHTML page if possible
-               $postcontent=get_html_header($student);
-               $postcontent.=$menudiv;
-               $postcontent.="<h1>" . $posttitle . "</h1>\r\n";
-               $postcontent.=get_post_content($postid,$student);//get the HTML out of the post
-               $postcontent.="<div id='comments'>" . $commentstring . "</div>\r\n";//get the HTML out of the post
-               $postcontent.=get_html_footer();
-
-
-               $filename = html_create_html_file($student,$postid,$postcontent,$posttitle); //create an HTML file of post content
-
-           }
-       }
-     }
-
-    //create an index / welcome page
-
-    $postcontent=get_html_header($student);
-    $postcontent.=$menudiv;
-    $postcontent.="<h1>Student ePortfolio</h1>\r\n";
-    $postcontent.="<div id='content'><p>Welcome to your exported ePortfolio. Follow the links in the menu to view your posts and files.</p></div>";//get the HTML out of the post
-               $postcontent.=get_html_footer();
+            $postcontent=get_html_header($student);
+            $postcontent.=$menudiv;
+            $postcontent.="<h1>Student ePortfolio</h1>\r\n";
+            $postcontent.="<div id='content'><p>Welcome to your exported ePortfolio. Follow the links in the menu to view your posts and files.</p></div>";//get the HTML out of the post
+            $postcontent.=get_html_footer();
  
-   html_create_index_file($student,$postcontent);
-
-
-
-      if(file_exists("/tmp/epmanagerbackup")) {
-           full_rmdir("/tmp/epmanagerbackup");
-           mkdir("/tmp/epmanagerbackup");
-       }  
-       else
-       {
-           mkdir("/tmp/epmanagerbackup");
-       }
+            html_create_index_file($student,$postcontent);
+               
+            if(file_exists("/tmp/epmanagerbackup")) {
+                full_rmdir("/tmp/epmanagerbackup");
+                mkdir("/tmp/epmanagerbackup");
+            }  
+            else
+            {
+                mkdir("/tmp/epmanagerbackup");
+            }
     
-     $archive_target="/tmp/epmanagerbackup/epmanager_HTML_".$student.".zip";
-     $archive_source="/tmp/".$student;    
+            $archive_target="/tmp/epmanagerbackup/epmanager_HTML_".$student.".zip";
+            $archive_source="/tmp/".$student;    
      
-     if (file_exists($archive_target))
-       unlink ($archive_target);
+            if (file_exists($archive_target))
+                unlink ($archive_target);
 
-     $archive = new PclZip($archive_target);
+                $archive = new PclZip($archive_target);
+                $v_list = $archive->add($archive_source,PCLZIP_OPT_REMOVE_PATH,'tmp/'.$student);
+
+                if ($v_list == 0) {
+                    die("Error : ".$archive->errorInfo(true));
+                }
    
 
-     $v_list = $archive->add($archive_source,PCLZIP_OPT_REMOVE_PATH,'tmp/'.$student);
-    
+                $redirectlocation="http://" . INTERNET_ROOT . "/downloader.php?id=$student&type=html";
 
-     if ($v_list == 0) {
-       die("Error : ".$archive->errorInfo(true));
-     }
-   
-
-   $redirectlocation="http://" . INTERNET_ROOT . "/downloader.php?id=$student&type=html";
-
-   redirect(2,$redirectlocation);
-
+                redirect(2,$redirectlocation);               
+            }
+        }
+    }
 }
 
+
+function get_html_export_menu($student) {
+    //loop through the resources again creating xhtml files and entries in the menu 
+    //theres a relationship id which carries to each record allowing sets of
+    //comments to be included in one html file
+       
+    $postcount=0;
+      
+    $link=dbconnect();
+    $query = 'SELECT * from '. $student .'_posts;';
+
+    $result=mysqli_query($link,$query);
+    $count = mysqli_num_rows($result);
+
+    dbdisconnect($link);
+
+    if($count==0) {
+        echo "there are no posts in this ePortfolio";
+    }
+    else
+    {
+        //loop through the resources creating a menu div to place in each html file
+        while( $row=mysqli_fetch_assoc($result) ) { 
+     
+            $postcount++;
+            // $categoryid = $row["term_taxonomy_id"];
+            // $categoryname = get_cat_name($categoryid,$student);
+            $postid= $row["ID"];
+            $postguid = get_post_guid($postid,$student);
+
+            if (check_attachment($postid,$student)==true) {
+
+                $posttitle=get_post_title($postid,$student);  //title of wordpress post
+                if($posttitle=='') {
+                    $posttitle='unknown';
+                }
+                $attachmentpath=get_attachment_path($postid,$student); //path to the attachment in uploads
+                $producttarget='files/' . basename($attachmentpath); //target for the location of the file in your zip
+
+                $menuarray[$postcount][0]=99;             //0 = a file
+                $menuarray[$postcount][1]="my files"; //1 = categoryname
+                $menuarray[$postcount][2]=$posttitle;    //2 = post title
+                $menuarray[$postcount][3]=$producttarget;//3 = post link
+                $menuarray[$postcount][4]=$postcount;    //4 = post count
+            }
+            else
+            {         
+      
+                //This is a post so we need a postID.htm file and a productID.xml file
+                //and to add these into the tree there's HTML in the posts so it's
+                //not practical to store that as xml. Easier just to make an HTML
+                //file with the contents of the post and refer to it.
+                //See if the post has been placed in a category (term taxonomy these days)
+                $postcategoryarray=get_post_category($postid,$student);
+                if(count($postcategoryarray)>0) {
+                    $categoryid=(int)$postcategoryarray[0];
+                    $categoryname=$postcategoryarray[1];
+                }
+                else
+                {
+                    $categoryid=1;
+                    $categoryname='ePortfolio awaiting category';                   
+                }
+               
+ 
+                //Create a resource file .htm with the post_content
+                $posttitle=get_post_title($postid,$student);
+                if($posttitle=='') {
+                    $posttitle='unknown';
+                }
+                //this just copies the functionality from html_create file function
+                //to save creating the files twice just to get their name
+                $filetitle = ereg_replace('[^A-Za-z0-9]', '_', $posttitle );
+                $filetitle = str_replace('.', '', $filetitle );
+                $filename = $postid . "_" . $filetitle;
+
+                $diskfile = $filename . '.html'; // a new filename comes back for the menu
+
+                $menuarray[$postcount][0]=$categoryid;   //0 = category id
+                $menuarray[$postcount][1]=$categoryname; //1 = categoryname
+                $menuarray[$postcount][2]=$posttitle;    //2 = post title
+                $menuarray[$postcount][3]=$diskfile;     //3 = post link
+                $menuarray[$postcount][4]=$postcount;    //4 = post count
+
+            }
+        }
+        
+        sort($menuarray);
+        $previouscategory="999";
+
+        //now build the menu div
+        $menudiv = "    <div id='menu'>\r\n";
+        $firstrecordpast==false;
+
+        $menudiv .= "  <h3>menu</h3>          <ul><li><a href='index.html'>home</a></li></ul>\r\n";   
+
+        for ($x=1;$x<count($menuarray);$x++) {
+            $currentcategory=$menuarray[$x][0];
+            $currentcatname=$menuarray[$x][1];
+            $currentposttitle=$menuarray[$x][2];
+            $currentlink=$menuarray[$x][3];
+            $currentcount=$menuarray[$x][4];
+
+            if($currentcategory!=$previouscategory) {
+                if($firstrecordpast==true) {
+                    $menudiv .= "            </ul>\r\n";   
+                }
+                $menudiv .= "            <h3>".$currentcatname."</h3>\r\n";     
+                $menudiv .= "            <ul>\r\n";     
+            }
+
+            $firstrecordpast=true;
+            $menudiv .= "            <li><a href='".$currentlink."'>".$currentposttitle."</a></li>\r\n";  
+
+            $previouscategory=$menuarray[$x][0];
+        }
+
+        $menudiv .= "        </ul>\r\n";
+        $menudiv .= "    </div>\r\n";
+
+        return $menudiv;
+    }
+}
 
 
 ?>
