@@ -1,4 +1,4 @@
-Introduction
+<h2>Introduction<h2>
 
 Some pre-requisites exist. You need to have a working LAMP setup so install MySQL, php5, apache2.
 
@@ -131,3 +131,4 @@ End Sub
 Troubleshooting
 
 If the install.php fails it will tell you why. It's almost always because of permissions (either the database username and password are wrong or config.php isn't writable) 
+
