@@ -15,8 +15,6 @@ Developers should refer to the contents of wp-content/plug3-singlesignonlink.php
 
 Issues
 -------
-Backup and restore not working yet.  < Only restore to do backup is now working
+Backup, Restore and HTML Export are newly fixed so there may still be problems
 
-The HTML Export has just been fixed
-
-
+Code cleanup is required
