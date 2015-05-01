@@ -151,7 +151,7 @@ function html_export($student) {
     $menudiv=get_html_export_menu($student);
     
     $link=dbconnect();
-    $query = 'SELECT * from '. $student .'_posts;';
+    $query = "SELECT * from {$student}_posts WHERE NOT post_type = 'revision'; ;";
 
     $result=mysqli_query($link,$query);
     $count = mysqli_num_rows($result);
@@ -315,7 +315,7 @@ function get_html_export_menu($student) {
     $postcount=0;
       
     $link=dbconnect();
-    $query = 'SELECT * from '. $student .'_posts;';
+    $query = "SELECT * from {$student}_posts WHERE NOT post_type = 'revision'; ";
 
     $result=mysqli_query($link,$query);
     $count = mysqli_num_rows($result);
@@ -373,6 +373,7 @@ function get_html_export_menu($student) {
  
                 //Create a resource file .htm with the post_content
                 $posttitle=get_post_title($postid,$student);
+                
                 if($posttitle=='') {
                     $posttitle='unknown';
                 }
@@ -384,11 +385,13 @@ function get_html_export_menu($student) {
 
                 $diskfile = $filename . '.html'; // a new filename comes back for the menu
 
-                $menuarray[$postcount][0]=$categoryid;   //0 = category id
-                $menuarray[$postcount][1]=$categoryname; //1 = categoryname
-                $menuarray[$postcount][2]=$posttitle;    //2 = post title
-                $menuarray[$postcount][3]=$diskfile;     //3 = post link
-                $menuarray[$postcount][4]=$postcount;    //4 = post count
+                
+                    $menuarray[$postcount][0]=$categoryid;   //0 = category id
+                    $menuarray[$postcount][1]=$categoryname; //1 = categoryname
+                    $menuarray[$postcount][2]=$posttitle;    //2 = post title
+                    $menuarray[$postcount][3]=$diskfile;     //3 = post link
+                    $menuarray[$postcount][4]=$postcount;    //4 = post count
+               
 
             }
         }
