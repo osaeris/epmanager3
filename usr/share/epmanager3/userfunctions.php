@@ -224,7 +224,9 @@ function restore_eilp_post($postid,$username) {
     $replaceid=generate_ilp_id($postid);
     $currentsession=get_current_session_long_format();
     $posttime=date('Y-m-d H:i:s');
-
+    $year=date('Y');
+    $sessionyears=($year-1).'\/'.substr($year,-2);
+    
     $eilpPosts = array(21,22,23,24,25);
 
     if (in_array($postid,$eilpPosts)) {
@@ -249,7 +251,9 @@ function restore_eilp_post($postid,$username) {
             exec('cat /etc/epmanager3/sql/'.$postfile.' | sed "{ 
                  s/joebloggs/'.$username.'/g
                  s/interneteproot/'.$eproot.'/g       
-                 s/10021/'.$replaceid.'/g                    
+                 s/sessionyears/'.$sessionyears.'/g                    
+                 s/postdate/'.$posttime.'/g                   
+                 s/newpostid/'.$replaceid.'/g                    
                 }" > /tmp/'.$postfile);
                 
         exec('mysql -h '.EP_DB_SERVER.' -u'.EP_DB_USERNAME.' -p'.EP_DB_PASSWORD.' '.EP_DB_DATABASE.'  < /tmp/'.$postfile);
