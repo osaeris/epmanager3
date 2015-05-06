@@ -239,13 +239,15 @@ function restore_eilp_post($postid,$username) {
       
         $link=dbconnect();
         
-        $query = "DELETE from `".$username."_posts` WHERE ID = $postreplace;";
+        $query = "DELETE from `".$username."_posts` WHERE ID = $replaceid;";
         mysqli_query($link,$query);
-        $query = "DELETE from `".$username."_postmeta` WHERE post_id = $postreplace;";
+        $query = "DELETE from `".$username."_posts` WHERE post_parent = $replaceid;";
+        mysqli_query($link,$query);        
+        $query = "DELETE from `".$username."_postmeta` WHERE post_id = $replaceid;";
         mysqli_query($link,$query);
-        $query = "DELETE from `".$username."_uam_accessgroup_to_object` WHERE object_id = $postreplace;";
+        $query = "DELETE from `".$username."_uam_accessgroup_to_object` WHERE object_id = $replaceid;";
         mysqli_query($link,$query);
-        $query = "DELETE from `".$username."_term_relationships` WHERE object_id = $postreplace;";
+        $query = "DELETE from `".$username."_term_relationships` WHERE object_id = $replaceid;";
         mysqli_query($link,$query);
       
             exec('cat /etc/epmanager3/sql/'.$postfile.' | sed "{ 
