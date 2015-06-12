@@ -1172,6 +1172,8 @@
     fwrite($fh, $stringData);
     $stringData = "<?php\n";
     fwrite($fh, $stringData);
+    $stringData = "define('DISALLOW_FILE_EDIT', true);\n";
+    fwrite($fh, $stringData);
     $stringData = "define('DB_NAME', '" . EP_DB_DATABASE . "');\n";
     fwrite($fh, $stringData);
     $stringData = "define('DB_USER', '" . EP_DB_USERNAME . "');\n";
