@@ -991,10 +991,7 @@
   //in wp-config.php to reflect your settings in 
   //config.php
 
-   $deletetarget="/tmp/joebloggs";
-   if (is_dir($deletetarget)) {
-       full_rmdir($deletetarget);
-   }
+
 
    if (is_dir('/tmp/joebloggs')!=true) {
        $archive_target="/etc/epmanager3/joebloggsupdated.zip";
@@ -1389,7 +1386,7 @@
   
   $archive_target="/tmp/epmanager_".$student.".zip";
   
-  
+  create_webfolders($student);
 
 
   // Read in file from form field
@@ -1398,8 +1395,8 @@
   if ($archive->extract(PCLZIP_OPT_PATH, '/tmp/') == 0) {
     die("Error : ".$archive->errorInfo(true));
   }
-
-  full_copy("/tmp/$oldstudent",PORTFOLIO_PATH.'/'.$student);
+  // copy over the uploads folder overwriting the old one
+  full_copy("/tmp/$student/wp-content/uploads",PORTFOLIO_PATH.'/'.$student.'/wp-content');
   $query_target="/tmp/temp.sql";
   
           $eproot=INTERNET_EPROOT;
