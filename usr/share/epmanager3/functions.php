@@ -276,9 +276,6 @@
     global $lecturerID;
     $link=dbconnect();
     
-    $student=mysqli_real_escape_string($student);
-    $lecturer=mysqli_real_escape_string($lecturer);
-    
     $query = "SELECT ID, user_login from $student" . "_users WHERE user_login='$lecturer'";   
 
     $result=mysqli_query($link,$query);
@@ -294,9 +291,6 @@
       }
     }
     // At this point we know the ID for lecturer so do some deleting
-
-    $query="DELETE FROM $student" . "_usermeta WHERE user_id='$lecturerID'";
-    mysqli_query($link,$query) or die(mysqli_error($link));
 
     $query="DELETE FROM ep_student_lecturers WHERE lecturer_id='$lecturer' AND student_id='$student'";
     mysqli_query($link,$query) or die(mysqli_error($link));
@@ -323,8 +317,6 @@
     global $verifierID;
     
     $link=dbconnect();
-    $student=mysqli_real_escape_string($link,$student);
-    $verifier=mysqli_real_escape_string($link,$verifier);
     $query = "SELECT ID, user_login from $student" . "_users WHERE user_login='$verifier'";   
 
     $result=mysqli_query($link,$query);
@@ -1406,6 +1398,7 @@
           exec('cat /tmp/'.$oldstudent.'.sql | sed "{ 
               s/'.$oldstudent.'/'.$student.'/g     
               s/interneteproot/'.$eproot.'/g      
+              s/updatedeportfolios/eportfolios/g   
               s/STUDENTEMAIL/'.$student.'@'.INTERNET_DOMAIN.'/g 
               s/portfoliopath/'.$portfoliopath.'/g 
           }" > /tmp/temp.sql.back');  

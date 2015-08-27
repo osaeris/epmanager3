@@ -116,7 +116,7 @@ if (isset($_POST['action']) && $_POST['action'] == 'submitted')
 
          $lecturer = $_POST['lecturer'];
 
- /*   echo '<pre>';
+/*    echo '<pre>';
     print_r($_POST);
     echo '<a href="'. $_SERVER['PHP_SELF'] .'">Please try again</a>';
     echo '</pre>'; */
@@ -127,8 +127,8 @@ if (isset($_POST['action']) && $_POST['action'] == 'submitted')
         
         foreach($_POST['studentlist'] as $student) 
         {
-          //echo "student : $student , lecturer : $lecturer" . "<br />";
-           delete_ep_lecturer($student, $lecturer);
+          echo "student : $student , lecturer : $lecturer" . "<br />";
+          delete_ep_lecturer($student, $lecturer);
         }
         echo "<p>lecturer $lecturer removed from ePortfolio $student</p>";
         echo "<p><a href='removesinglelecturer.php'>&larr;&nbsp;back</a></p>";
