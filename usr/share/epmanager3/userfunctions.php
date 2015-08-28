@@ -225,14 +225,37 @@ function restore_eilp_post($postid,$username) {
     $currentsession=get_current_session_long_format();
     $posttime=date('Y-m-d H:i:s');
     $year=date('Y');
-    $sessionyears=($year-1).'\/'.substr($year,-2);
+    $currentmonth=intval(date('n'));
+    
+    if($currentmonth<8) {
+        $sessionyears=($year-1).'\/'.substr($year,-2);
+    }
+    else
+    {
+        $sessionyears=$year.'\/'.substr($year+1,-2);
+    }
     
     $eilpPosts = array(21,22,23,24,25);
+    
 
     if (in_array($postid,$eilpPosts)) {
         //do the restoration by deleting existing posts
         //with this id then recreating them
         $postreplace="100$postid";
+        if($currentmonth<8) {
+            $newpostidstring=($year-1);
+            $newpostidstring.=($year);
+            $newpostidstring.=$postid;
+            $newpostid=intval($newpostidstring);
+        }
+        else
+        {
+            $newpostidstring=($year);
+            $newpostidstring.=($year+1);
+            $newpostidstring.=$postid;
+            $newpostid=intval($newpostidstring);
+
+        }
         $postfile="post_$postid.sql";
         $eproot=INTERNET_EPROOT;
         $eproot=str_replace("/","\/",$eproot);
