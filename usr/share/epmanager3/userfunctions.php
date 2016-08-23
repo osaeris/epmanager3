@@ -123,7 +123,7 @@ function create_portfolio($student, $lecturer, $adminpass, $courseid, $courseblo
     
     // include the next two lines if secure socket login
     if (INTERNET_EPSECURE=="on") {
-    $query = 'update '.$student.'_options set option_value = replace(option_value,\'http\',\'https\') WHERE option_id = 1;';
+    $query = 'update '.$student.'_options set option_value = replace(option_value,\'http:\',\'https:\') WHERE option_id = 1;';
     mysqli_query($link,$query) or die(mysqli_error($link));
     }
 
