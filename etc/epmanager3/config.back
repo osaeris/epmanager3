@@ -32,5 +32,5 @@ define('STUDENT_DB_DATABASE', 'databasename');// the student records database
 define('STUDENT_DB_USERNAME', 'databaseuser');// the student records database user
 define('STUDENT_DB_PASSWORD', 'databasepassword');// the student records database user password
 
-define('EP_SSO_SALT', 'A long salt value');// enter a good long salt value
+define('EP_SSO_SALT', 'A long salt value here');// this is the salt value for SSO plugin
 ?>

@@ -6,6 +6,7 @@ see wp-content/plugins/wp3-singlesignonlink.php in a newly created portfolio for
 
 */
 
-define('EP_SSO_SALT', '389');// xxx
+include('/etc/epmanager3/config.php');
+//define('EP_SSO_SALT', '389');// xxx
 
 ?>
