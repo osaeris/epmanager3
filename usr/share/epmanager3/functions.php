@@ -46,7 +46,8 @@
     global $footerString;
 
     $footerString = '';
-    $footerString = $footerString . "<div id='footer'><img src='images/FinalLogoColour.png' alt='dumfries and galloway college logo' /><br />&copy;&nbsp;2007-2015 (Revision ".EP_VERSION.")</div>";
+    $revision = EP_VERSION;
+    $footerString = $footerString . "<div id='footer'><img src='images/FinalLogoColour.png' alt='dumfries and galloway college logo' /><br />&copy;&nbsp;2007-2015 (Revision $revision)</div>";
 
     return $footerString;
   }

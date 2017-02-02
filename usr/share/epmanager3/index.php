@@ -27,9 +27,15 @@
 <?php
 
 if (isset($_SESSION['logged'])) {
+  if(MANAGER_LDAP=='off') {
     if ($_SESSION['logged']=='true') {
         echo "<p>You can <a href='changepassword.php'>change your EPManager login password using this form</a></p>";
     }
+  }
+  else
+  {
+      echo "<p>If you wish to change your password please do so on your network as LDAP is enabled.</p>";
+  }
 }
 
     $link=dbconnect();
