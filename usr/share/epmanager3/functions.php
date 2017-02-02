@@ -62,6 +62,14 @@
   function login($user, $password) { //attempt to login false if invalid true if correct
     $auth = false;
 
+    // Check for LDAP login
+    if(MANAGER_LDAP=='on') {
+      $auth = ldap_checklogin($user,$password); 
+      if($auth==true) {
+          return $auth;
+      }
+    }
+    // No LDAP go back to database check
     $link=dbconnect();
     $user=mysqli_real_escape_string($link,$user);
      
@@ -76,6 +84,44 @@
     }
 
     return $auth;
+  }
+
+  function ldap_checklogin($username,$password) {
+
+    $login=false;
+    $ldapusername="{$username}@college.dumgal.ac.uk";
+
+    $ldapserver = "ldap://" . MAN_LDAP_SERVER;
+    $ad = ldap_connect($ldapserver);
+  
+    ldap_set_option($ad, LDAP_OPT_PROTOCOL_VERSION, 3);
+    $bd = ldap_bind($ad,$ldapusername,$password);
+
+    /* FAILOVER  */
+    if(!$bd) {
+        $ldapserver = "ldap://" . MAN_LDAP_FAILOVER_SERVER;
+        $ad = ldap_connect($ldapserver);
+        ldap_set_option($ad, LDAP_OPT_PROTOCOL_VERSION, 3);
+        $bd = ldap_bind($ad,$ldapusername,$password);
+    }
+
+    // IF LDAP was successful set login to true
+    if(!$bd) {
+        $login=false;
+    }
+    else
+    {
+        $login=true;
+    }
+    // MUST CHECK FOR BLANK PASSWORD SEE http://www.php.net/manual/en/function.ldap-bind.php
+    if($password=='') {
+       $login=false;
+    }
+    if($password==null) {
+       $login=false;
+    }
+   
+    return $login;
   }
 
   function get_level($user) { //return the user privelidge
