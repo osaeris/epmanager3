@@ -1,6 +1,6 @@
 <?php
 // Version
-define('EP_VERSION', '21042015-01'); //ddmmyy-ver
+define('EP_VERSION', '2017020101'); //yyyymmddvv
 
 // Crucial settings - These are crucial and must be filled in before running installer 
 
