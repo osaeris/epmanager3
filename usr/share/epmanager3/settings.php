@@ -8,7 +8,6 @@
 <?php include("/etc/epmanager3/config.php"); ?>
 <?php include("dbinfo.php"); ?>
 <?php require_once('libraries/pclzip.lib.php'); ?>
-
  <body>
    <div id='container'>
      <div id='header'>
@@ -65,9 +64,12 @@ $mispass = ''; // MIS database password
 $cmislink = ''; // Link to CMIS system for quick student search
 $cmisurl = ''; // Full URL to your CMIS system (could be https or http)
 
-
 $ssosalt='';//SSO SALT Value
 $testing = ''; // Tells the page if a test field is being used 
+$ldap = '';
+$ldapserver='';
+$ldapfailoverserver='';
+$ldapsuffix='';
 
        $pagevalid=true;
        $errorcode="<p class='warning'>There was a problem</p><ul>";
@@ -129,11 +131,19 @@ $testing = ''; // Tells the page if a test field is being used
 
 
         $cmisurl = $_POST['cmisurl'];
-
-
-
         $ssosalt= $_POST['ssosalt'];
 
+        if (!isset($_POST["ldap"])) {
+            $ldap = 'off';
+        }
+        else
+        {
+            $ldap = 'on'; 
+        }
+        $ldapserver=$_POST['ldapserver'];
+        $ldapfailoverserver=$_POST['ldapfailoverserver'];
+        $ldapsuffix=$_POST['ldapsuffix'];
+        
        if ($_POST['netroot'] == '' || $_POST['netroot'] == 'nothing')
        {
          $pagevalid=false;
@@ -245,7 +255,14 @@ $testing = ''; // Tells the page if a test field is being used
          }
       }
    
+      if ($ldap=='on') {
+        if ($_POST['ldapserver'] == '' && $_POST['ldapfailoverserver'] == '')
+        {
+           $pagevalid=false;
+          $errorcode=$errorcode .  "<li>Your LDAP servers should not both be blank if you have checked LDAP Link</li>";
+        }
 
+      }
    
 
     if (isset($_POST['student']) && $_POST['student'] == 'test!' && $pagevalid == true)
@@ -283,7 +300,7 @@ $testing = ''; // Tells the page if a test field is being used
 
 
 
-          create_manager_config_file($netroot, $neteproot, $epsecure, $localpath, $portfoliopath, $netdomain, $lecturerpass, $localserver, $localdb, $localuser, $localpass, $mis, $missystem, $misdbms, $misserver, $misdb, $misuser, $mispass,  $cmislink, $cmisurl,$ssosalt);
+          create_manager_config_file($netroot, $neteproot, $epsecure, $localpath, $portfoliopath, $netdomain, $lecturerpass, $localserver, $localdb, $localuser, $localpass, $mis, $missystem, $misdbms, $misserver, $misdb, $misuser, $mispass,  $cmislink, $cmisurl, $ssosalt, $ldap, $ldapserver, $ldapfailoverserver, $ldapsuffix);
 
 
 
@@ -467,6 +484,26 @@ else
        <label for="cmisurl">Full URL of CMIS search (e.g. <b>https://www.cmis-system.com/search.php?id=</b>)</label>
        <input type="text" name="cmisurl" size="60" value="<?php echo CMIS_URL; ?>" /><br />
 
+</fieldset>
+
+
+
+<fieldset>
+    <legend>LDAP settings</legend>
+<?php if (MANAGER_LDAP=='on')
+    { ?> <input type="checkbox" name="ldap" CHECKED />LDAP enabled?<br />
+   <?php }
+   else
+            { ?>
+<input type="checkbox" name="ldap" />LDAP enabled?<br />
+     <?php } ?>
+
+   <label for="ldapserver">Preferred domain controller</label>
+       <input type="text" name="ldapserver" size="60" value="<?php echo MAN_LDAP_SERVER; ?>"/><br />
+   <label for="ldapfailoverserver">Failover domain controller</label>
+       <input type="text" name="ldapfailoverserver" size="60" value="<?php echo MAN_LDAP_FAILOVER_SERVER; ?>"/><br />
+   <label for="ldapsuffix">LDAP Suffix e.g. @yourdomain.com</label>
+       <input type="text" name="ldapsuffix" size="60" value="<?php echo MAN_LDAP_SUFFIX; ?>"/><br />
 </fieldset>
 
 

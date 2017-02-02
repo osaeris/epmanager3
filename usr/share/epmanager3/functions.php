@@ -1062,14 +1062,14 @@
    
   }
 
-  function create_manager_config_file($netroot='localhost/epmanager', $neteproot='localhost/epmanager/eportfolios', $epsecure='unchecked', $localpath='/usr/share/epmanager',  $portfoliopath='/usr/share/epmanager/eportfolios',   $netdomain='localhost', $lecturerpass='lecturer', $localserver='localhost', $localdb='eportfolio', $localuser='epuser', $localpass='eppass', $misint='unchecked', $missystem='sits', $misdbms='mssql', $misserver='localhost', $misdb='misdb', $misuser='misuser', $mispass='mispass',  $cmislink='off', $cmisurl='http://your-cmis/yoursearch.php?id=', $ssosalt='put your own long value here') {
+  function create_manager_config_file($netroot='localhost/epmanager', $neteproot='localhost/epmanager/eportfolios', $epsecure='unchecked', $localpath='/usr/share/epmanager',  $portfoliopath='/usr/share/epmanager/eportfolios',   $netdomain='localhost', $lecturerpass='lecturer', $localserver='localhost', $localdb='eportfolio', $localuser='epuser', $localpass='eppass', $misint='unchecked', $missystem='sits', $misdbms='mssql', $misserver='localhost', $misdb='misdb', $misuser='misuser', $mispass='mispass',  $cmislink='off', $cmisurl='http://your-cmis/yoursearch.php?id=', $ssosalt='put your own long value here', $ldap='off', $ldapserver='put your primary LDAP server here', $ldapfailoverserver='put your failover server here', $ldapsuffix='put your LDAP suffix here' ) {
 
 
   global $stringData;
 
     $myFile =  "/etc/epmanager3/config.php";
     
-    $fh = fopen($myFile, 'w') or die("can't open file");
+    $fh = fopen($myFile, 'w') or die("can't open file. please allow web server write permission temporarily");
    
     fwrite($fh, $stringData);
     $stringData = "<?php\n";
@@ -1184,6 +1184,20 @@
     fwrite($fh, $stringData);
 
     $stringData = "define('EP_SSO_SALT', '" . $ssosalt . "');// xxx\n";
+    fwrite($fh, $stringData);
+
+    if ($ldap=='on')
+    $stringData = "define('MANAGER_LDAP', 'on'); \n";
+    else
+    $stringData = "define('MANAGER_LDAP', 'off'); \n";
+
+    fwrite($fh, $stringData);
+
+    $stringData = "define('MAN_LDAP_SERVER', '" . $ldapserver . "');// xxx\n";
+    fwrite($fh, $stringData);
+    $stringData = "define('MAN_LDAP_FAILOVER_SERVER', '" . $ldapfailoverserver . "');// xxx\n";
+    fwrite($fh, $stringData);
+    $stringData = "define('MAN_LDAP_SUFFIX', '" . $ldapsuffix . "');// xxx\n";
     fwrite($fh, $stringData);
 
 
