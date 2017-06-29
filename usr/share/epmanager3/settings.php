@@ -25,6 +25,7 @@
 
 
 <?php
+
 get_menu(); 
 if (isset($_POST['action']) && $_POST['action'] == 'submitted') 
 {
@@ -51,7 +52,7 @@ $portfoliopath = ''; // local path to eportfolios
 $netdomain = ''; // domain for default lecturer email address
 $lecturerpass = ''; // default lecturer password
 //student records integration settings
-$mis = '';// temporary value for mis checkbox (checked/unchecked)
+
 $misint = '';// MIS integration flag (off/on)
 $missystem = ''; // MIS system
 $misdbms = ''; // MIS DBMS system
@@ -103,9 +104,6 @@ $ldapsuffix='';
         }
         else
         {
-            if ($_POST['misint'] == '' || $_POST['misint'] == 'nothing')
-                $misint = 'off';       	
-            else
                 $misint = $_POST['misint']; 	
         }
 
@@ -211,9 +209,8 @@ $ldapsuffix='';
        }
 
 
-
    
-      if ($misint='checked')
+      if ($misint=='on')
       {
          if ($_POST['misserver'] == '' || $_POST['misserver'] == 'nothing')
          {
@@ -299,8 +296,7 @@ $ldapsuffix='';
 
 
 
-
-          create_manager_config_file($netroot, $neteproot, $epsecure, $localpath, $portfoliopath, $netdomain, $lecturerpass, $localserver, $localdb, $localuser, $localpass, $mis, $missystem, $misdbms, $misserver, $misdb, $misuser, $mispass,  $cmislink, $cmisurl, $ssosalt, $ldap, $ldapserver, $ldapfailoverserver, $ldapsuffix);
+          create_manager_config_file($netroot, $neteproot, $epsecure, $localpath, $portfoliopath, $netdomain, $lecturerpass, $localserver, $localdb, $localuser, $localpass, $misint, $missystem, $misdbms, $misserver, $misdb, $misuser, $mispass,  $cmislink, $cmisurl, $ssosalt, $ldap, $ldapserver, $ldapfailoverserver, $ldapsuffix);
 
 
 

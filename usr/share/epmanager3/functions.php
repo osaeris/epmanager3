@@ -1062,7 +1062,7 @@
    
   }
 
-  function create_manager_config_file($netroot='localhost/epmanager', $neteproot='localhost/epmanager/eportfolios', $epsecure='unchecked', $localpath='/usr/share/epmanager',  $portfoliopath='/usr/share/epmanager/eportfolios',   $netdomain='localhost', $lecturerpass='lecturer', $localserver='localhost', $localdb='eportfolio', $localuser='epuser', $localpass='eppass', $misint='unchecked', $missystem='sits', $misdbms='mssql', $misserver='localhost', $misdb='misdb', $misuser='misuser', $mispass='mispass',  $cmislink='off', $cmisurl='http://your-cmis/yoursearch.php?id=', $ssosalt='put your own long value here', $ldap='off', $ldapserver='put your primary LDAP server here', $ldapfailoverserver='put your failover server here', $ldapsuffix='put your LDAP suffix here' ) {
+  function create_manager_config_file($netroot='localhost/epmanager', $neteproot='localhost/epmanager/eportfolios', $epsecure='unchecked', $localpath='/usr/share/epmanager',  $portfoliopath='/usr/share/epmanager/eportfolios',   $netdomain='localhost', $lecturerpass='lecturer', $localserver='localhost', $localdb='eportfolio', $localuser='epuser', $localpass='eppass', $misint='off', $missystem='sits', $misdbms='mssql', $misserver='localhost', $misdb='misdb', $misuser='misuser', $mispass='mispass',  $cmislink='off', $cmisurl='http://your-cmis/yoursearch.php?id=', $ssosalt='put your own long value here', $ldap='off', $ldapserver='put your primary LDAP server here', $ldapfailoverserver='put your failover server here', $ldapsuffix='put your LDAP suffix here' ) {
 
 
   global $stringData;
@@ -1122,10 +1122,13 @@
     $stringData = "// Student Records Database Settings - These are entirely optional \n\n";
     fwrite($fh, $stringData);
 
-    if ($misint=='checked')
-    $stringData = "define('MIS_INTEGRATION', 'on');//  For MIS integration features - change to 'on' or off\n";
+    if ($misint=='on') {
+        $stringData = "define('MIS_INTEGRATION', 'on');//  For MIS integration features - change to 'on' or off\n";
+    }
     else
-    $stringData = "define('MIS_INTEGRATION', 'off');//  For MIS integration features - change to 'on' or off\n\n";
+    {
+        $stringData = "define('MIS_INTEGRATION', 'off');//  For MIS integration features - change to 'on' or off\n\n";
+    }
 
     fwrite($fh, $stringData);
  
@@ -1520,17 +1523,18 @@
 
     echo "<meta http-equiv=\"refresh\" content=\"{$time}; url={$topage}\" /> ";
   }
-//count_course_student_list($courseid,$courseblock,$courseocc,$session,"all"
+
   function count_course_student_list($coursecode='',$courseblock='',$courseocc='',$session='',$scope='all')  {
   // A precursor for get_course_student_list this
   // function returns a count to see if it's worth
   // getting the student list data
     global $studentcode;
 
-    $db_server = STUDENT_DB_SERVER;
-    $db_database = STUDENT_DB_DATABASE;
-    $db_username = STUDENT_DB_USERNAME;
-    $db_password = STUDENT_DB_PASSWORD;
+    $hostname = STUDENT_DB_SERVER;
+    $port =     1433;
+    $dbname =   STUDENT_DB_DATABASE;
+    $username = STUDENT_DB_USERNAME;
+    $pw =       STUDENT_DB_PASSWORD;
 
     switch (MIS_SYSTEM)
     {
@@ -1544,28 +1548,44 @@
                break;
 
                case "mssql":
-                   $db = mssql_connect($db_server,$db_username,$db_password) or die("ERROR CONNECTING TO: ".$db_server."<br>".mysqli_error($link));
-                   mssql_select_db($db_database,$db) or die("COULD NOT SELECT DATABASE: ".$db_database."<br>".mysqli_error($link));
+             
+                   try {
 
-                   $php_errormsg = "";
-                   $existing_test=FALSE;
+                       $dbh =      new PDO ("dblib:host=$hostname:$port;dbname=$dbname","$username","$pw");
+                   } catch (PDOException $e) {
 
-                   $output_HTML = "";
-
+                       return false;
+                   }        
+        
                    $query = "SELECT sce_stuc as StudentCode, sce_srtn + ',' + sce_stuc as FullName , sce_blok, sce_occl ";
                    $query = $query . "FROM dbo.srs_sce WHERE (ISNULL(RTRIM(dbo.srs_sce.sce_stac),'')";
-                   $query = $query . "='C') and sce_crsc = '$coursecode' and sce_ayrc = '$session' ";
+                   $query = $query . "='C') and sce_crsc = :coursecode and sce_ayrc = :session ";
 
                    if ($courseblock!='') {
-                       $query = $query . " and sce_blok = '$courseblock' ";
+                       $query = $query . " and sce_blok = :courseblock ";
                    }
     
                    if ($courseocc!='') {
-                       $query = $query . " and sce_occl = '$courseocc' ";
+                       $query = $query . " and sce_occl = :courseocc ";
+                   }        
+   
+                   $stmt = $dbh->prepare($query);
+                   $stmt->bindParam(':coursecode',$coursecode,PDO::PARAM_STR);
+                   $stmt->bindParam(':session',$session,PDO::PARAM_STR);
+                   if ($courseblock!='') {
+                       $stmt->bindParam(':courseblock',$courseblock,PDO::PARAM_STR);
                    }
+                   if ($courseocc!='') {
+                       $stmt->bindParam(':courseocc',$courseocc,PDO::PARAM_STR);
+                   }
+                   
+                   $stmt->execute();               
+                   $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                 
+                   $existing_test=FALSE;
+                   $output_HTML = "";
 
-                   $result = mssql_query($query,$db) or die ('Query failed: '.$query);
-                   $num=mssql_num_rows($result);
+                   $num=count($row);
     
                    $tempcount=0;
                    $i=0;
@@ -1579,7 +1599,7 @@
                      case "not":
                        while ($i < $num)
                        {
-                         $studentcode=mssql_result($result,$i,"StudentCode");
+                         $studentcode=$row[$i]['StudentCode'];
               
                          if (check_student_ep($studentcode) < 1)
                          $tempcount=$tempcount;
@@ -1591,7 +1611,7 @@
                      case "existing":
                       while ($i < $num)
                       {
-                       $studentcode=mssql_result($result,$i,"StudentCode");
+                       $studentcode=$row[$i]['StudentCode'];
 
                        if (check_student_ep($studentcode) > 0)
                            $tempcount=$tempcount+1;
@@ -1602,8 +1622,8 @@
 
                    }
 
-
-                   mssql_close();
+                   unset($dbh);
+                   unset($stmt);
 
               }
               break;
@@ -1674,22 +1694,12 @@
         {
 
             $output_HTML = $output_HTML . "  <option value='$studentcode'>$studentcode, $studentnicename</option>\n\r";
-          
-         
         }
-       
-        
           $i++;
       }
 
-
       $output_HTML = $output_HTML . "</select>";
-
-
-     
-
-      
-        $output_HTML = $existing_warning . $output_HTML;
+      $output_HTML = $existing_warning . $output_HTML;
       
     }
     else
@@ -1715,36 +1725,52 @@
     // not : Return only students who do not already have an ePortfolio
     global $studentcode;
 
-    $db_server = STUDENT_DB_SERVER;
-    $db_database = STUDENT_DB_DATABASE;
-    $db_username = STUDENT_DB_USERNAME;
-    $db_password = STUDENT_DB_PASSWORD;
+    $hostname = STUDENT_DB_SERVER;
+    $port =     1433;
+    $dbname =   STUDENT_DB_DATABASE;
+    $username = STUDENT_DB_USERNAME;
+    $pw =       STUDENT_DB_PASSWORD;
 
-    $db = mssql_connect($db_server,$db_username,$db_password) or die("ERROR CONNECTING TO: ".$db_server."<br>".mysqli_error($link));
-    mssql_select_db($db_database,$db) or die("COULD NOT SELECT DATABASE: ".$db_database."<br>".mysqli_error($link));
+                  try {
 
-    $php_errormsg = "";
+                       $dbh =      new PDO ("dblib:host=$hostname:$port;dbname=$dbname","$username","$pw");
+                   } catch (PDOException $e) {
+
+                       return false;
+                   }        
+        
+                   $query = "SELECT sce_stuc as StudentCode, sce_srtn + ',' + sce_stuc as FullName , sce_blok, sce_occl ";
+                   $query = $query . "FROM dbo.srs_sce WHERE (ISNULL(RTRIM(dbo.srs_sce.sce_stac),'')";
+                   $query = $query . "='C') and sce_crsc = '$coursecode' and sce_ayrc = '$session' ";
+    
+                   if ($courseblock!='') {
+                       $query = $query . " and sce_blok = '$courseblock' ";
+                   }
+                   
+                   if ($courseocc!='') {
+                       $query = $query . " and sce_occl = '$courseocc' ";
+                   }
+    
+                   $stmt = $dbh->prepare($query);
+                   $stmt->bindParam(':coursecode',$coursecode,PDO::PARAM_STR);
+                   $stmt->bindParam(':session',$session,PDO::PARAM_STR);
+                   if ($courseblock!='') {
+                       $stmt->bindParam(':courseblock',$courseblock,PDO::PARAM_STR);
+                   }
+                   if ($courseocc!='') {
+                       $stmt->bindParam(':courseocc',$courseocc,PDO::PARAM_STR);
+                   }
+                   
+                   $stmt->execute();               
+                   $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                 
+                   $existing_test=FALSE;
+                   $output_HTML = "";
+
+                   $num=count($row);    
+
     $existing_test=FALSE;
-
     $output_HTML = "";
-
-    $query = "SELECT sce_stuc as StudentCode, sce_srtn + ',' + sce_stuc as FullName , sce_blok, sce_occl ";
-    $query = $query . "FROM dbo.srs_sce WHERE (ISNULL(RTRIM(dbo.srs_sce.sce_stac),'')";
-    $query = $query . "='C') and sce_crsc = '$coursecode' and sce_ayrc = '$session' ";
-    
-    if ($courseblock!='') {
-        $query = $query . " and sce_blok = '$courseblock' ";
-    }
-    
-    if ($courseocc!='') {
-        $query = $query . " and sce_occl = '$courseocc' ";
-    }
-    
-
-    $result = mssql_query($query,$db) or die ('Query failed: '.$query);
-   
-
-    $num=mssql_num_rows($result);
    
 
     if ($num > 0)
@@ -1755,11 +1781,8 @@
       while ($i < $num)
       {
         
-        $studentcode=mssql_result($result,$i,"StudentCode");
-
-
-
-        $name=mssql_result($result,$i,"FullName");
+        $studentcode=$row[$i]["StudentCode"];
+        $name=$row[$i]["FullName"];
 
         $name=preg_replace('/\'/', '', $name);
 
@@ -1787,21 +1810,17 @@
       $output_HTML = $output_HTML . "</select>";
 
 
-	switch ($scope) {
-	case "all":
-    		$existing_warning = "<p class='warning'>Students listed in bold and red already have an ePortfolio. </p>";
-    		break;
-	case "not":
-    		$existing_warning = "<p class='warning'>Students listed do not have an ePortfolio.</p>";
-    		break;
-	case "existing":
-    		$existing_warning = "<p class='warning'>Students listed have an ePortfolio.</p>";
-    		break;
-	}
-
-     
-
-      
+        switch ($scope) {
+        case "all":
+            $existing_warning = "<p class='warning'>Students listed in bold and red already have an ePortfolio. </p>";
+            break;
+        case "not":
+            $existing_warning = "<p class='warning'>Students listed do not have an ePortfolio.</p>";
+            break;
+        case "existing":
+            $existing_warning = "<p class='warning'>Students listed have an ePortfolio.</p>";
+            break;
+        }
         $output_HTML = $existing_warning . $output_HTML;
       
     }
@@ -1809,10 +1828,9 @@
     {
       $output_HTML = "no students found";
     }
-    mssql_close();
-
-
-
+    
+    unset($dbh);
+    unset($stmt);
 
     echo $output_HTML;
   }
@@ -1827,12 +1845,15 @@
   // the MIS system and below that the DBMS
   // Sorry I can only do SITS on MSSQL because that
   // is what we use here.
+
   if (MIS_INTEGRATION=='on') {
+  
     global $nicename;
-    $db_server = STUDENT_DB_SERVER;
-    $db_database = STUDENT_DB_DATABASE;
-    $db_username = STUDENT_DB_USERNAME;
-    $db_password = STUDENT_DB_PASSWORD;
+    $hostname = STUDENT_DB_SERVER;
+    $port =     1433;
+    $dbname =   STUDENT_DB_DATABASE;
+    $username = STUDENT_DB_USERNAME;
+    $pw =       STUDENT_DB_PASSWORD;
 
     switch (MIS_SYSTEM)
     {
@@ -1847,17 +1868,26 @@
                break;
 
                case "mssql":  //Microsoft SQL Server
-                 
-                    $db = mssql_connect($db_server,$db_username,$db_password) or die("ERROR CONNECTING TO: ".$db_server."<br>".mysqli_error($link));
-                    mssql_select_db($db_database,$db) or die("COULD NOT SELECT DATABASE: ".$db_database."<br>".mysqli_error($link));
+                
+                  try {
 
-                    $php_errormsg = "";
+                       $dbh =      new PDO ("dblib:host=$hostname:$port;dbname=$dbname","$username","$pw");
+                   } catch (PDOException $e) {
 
+                       return false;
+                   }        
+                         
                     $query = 'SELECT stu_name FROM ins_stu ';
-                    $query = $query . ' WHERE stu_code = \''.$student.'\' ';
+                    $query = $query . ' WHERE stu_code = :studentcode ';
   
-                    $result = mssql_query($query,$db) or die ('Query failed: '.$query);
-                    $num=mssql_num_rows($result);
+                   $stmt = $dbh->prepare($query);
+                   $stmt->bindParam(':studentcode',$student,PDO::PARAM_STR);
+         
+                  
+                   
+                   $stmt->execute();               
+                   $row = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                   $num=count($row);    
 
                     if ($num > 0)
                     {
@@ -1865,7 +1895,7 @@
                       while ($i < $num)
                       {
        
-                        $nicename=mssql_result($result,$i,"stu_name");
+                        $nicename=$row[$i]["stu_name"];
                         $nicename=preg_replace('/\'/', '', $nicename);
 
                         $i++;
@@ -1878,7 +1908,8 @@
                   //student
                     $nicename=get_local_nicename($student);
                   }
-                  mssql_close();
+                  unset($dbh);
+                  unset($stmt);
                 
               break;
 
