@@ -1741,14 +1741,14 @@
         
                    $query = "SELECT sce_stuc as StudentCode, sce_srtn + ',' + sce_stuc as FullName , sce_blok, sce_occl ";
                    $query = $query . "FROM dbo.srs_sce WHERE (ISNULL(RTRIM(dbo.srs_sce.sce_stac),'')";
-                   $query = $query . "='C') and sce_crsc = '$coursecode' and sce_ayrc = '$session' ";
+                   $query = $query . "='C') and sce_crsc = :coursecode and sce_ayrc = :session ";
     
                    if ($courseblock!='') {
-                       $query = $query . " and sce_blok = '$courseblock' ";
+                       $query = $query . " and sce_blok = :courseblock ";
                    }
                    
                    if ($courseocc!='') {
-                       $query = $query . " and sce_occl = '$courseocc' ";
+                       $query = $query . " and sce_occl = :courseocc ";
                    }
     
                    $stmt = $dbh->prepare($query);
