@@ -1079,6 +1079,9 @@
     $stringData = "// Crucial settings - These are crucial and must be filled in before running installer \n\n";
     fwrite($fh, $stringData);
 
+    $stringData = "define('EP_VERSION', '20072017');// the server with epmanager mysql database\n";
+    fwrite($fh, $stringData);
+
     $stringData = "define('EP_DB_SERVER', '" . $localserver . "');// the server with epmanager mysql database\n";
     fwrite($fh, $stringData);
 
