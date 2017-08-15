@@ -234,7 +234,6 @@ function restore_eilp_post($postid,$username) {
     {
         $sessionyears=$year.'\/'.substr($year+1,-2);
     }
-    
     $eilpPosts = array(21,22,23,24,25);
     
 
@@ -272,17 +271,17 @@ function restore_eilp_post($postid,$username) {
         mysqli_query($link,$query);
         $query = "DELETE from `".$username."_term_relationships` WHERE object_id = $replaceid;";
         mysqli_query($link,$query);
-      
+
             exec('cat /etc/epmanager3/sql/'.$postfile.' | sed "{ 
                  s/joebloggs/'.$username.'/g
                  s/interneteproot/'.$eproot.'/g       
                  s/sessionyears/'.$sessionyears.'/g                    
                  s/postdate/'.$posttime.'/g                   
+                 s/pdgmt/'.$posttime.'/g
                  s/newpostid/'.$replaceid.'/g                    
                 }" > /tmp/'.$postfile);
                 
         exec('mysql -h '.EP_DB_SERVER.' -u'.EP_DB_USERNAME.' -p'.EP_DB_PASSWORD.' '.EP_DB_DATABASE.'  < /tmp/'.$postfile);
-      
 
     }
     else
@@ -737,15 +736,13 @@ function generate_ilp_id($id) {
       $currentsession='';
       $month = date('m');
       $currentyear= date('Y');
-      if($month > 8) {
+      if($month > 7) {
           $currentsession = $currentyear . substr($currentyear+1,-2) . $id;
       }
       else
       {
           $currentsession = $currentyear -1 . substr($currentyear,-2) . $id;
       }
-
-
       return intval($currentsession);
 
 }
