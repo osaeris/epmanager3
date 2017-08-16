@@ -70,7 +70,7 @@
         . '  `student_eportfolio_id` bigint(11) NOT NULL auto_increment,'
         . '  `student_eportfolio_folder` varchar(64) NOT NULL default \'\''
         . '  ,`student_id` varchar(20) NOT NULL default \'\','
-        . '  `student_nicename` varchar(20) NOT NULL default \'\''
+        . '  `student_nicename` varchar(128) NOT NULL default \'\''
         . '  , PRIMARY KEY  (`student_eportfolio_id`))'
         . '  ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=161 ;';
         mysqli_query($link,$sql) or die(mysqli_error());
