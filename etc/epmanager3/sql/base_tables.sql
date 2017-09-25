@@ -244,3 +244,18 @@ CREATE TABLE IF NOT EXISTS `joebloggs_users` (
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+--
+--  Table structure for termmeta
+--
+
+CREATE TABLE `joebloggs_termmeta` (
+`meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+`term_id` bigint(20) unsigned NOT NULL DEFAULT '0',
+`meta_key` varchar(255)  DEFAULT NULL,
+`meta_value` longtext ,
+PRIMARY KEY (`meta_id`),
+KEY `term_id` (`term_id`),
+KEY `meta_key` (`meta_key`(191))
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
+
