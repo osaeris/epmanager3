@@ -95,19 +95,19 @@ if (isset($_POST['action']) && $_POST['action'] == 'submitted')
 ?>
    </select>
    <br />
-   <input type="checkbox" name="eilposts[ ]" value="21" />&nbsp;
+   <input type="checkbox" name="eilposts[ ]" value="22" />&nbsp;
    1st Meeting Goals<br />
 
-   <input type="checkbox" name="eilposts[ ]" value="22" />&nbsp;
+   <input type="checkbox" name="eilposts[ ]" value="23" />&nbsp;
    2nd Meeting Goals<br />
 
-   <input type="checkbox" name="eilposts[ ]" value="23" />&nbsp;
+   <input type="checkbox" name="eilposts[ ]" value="24" />&nbsp;
    3rd Meeting Goals<br />
 
-   <input type="checkbox" name="eilposts[ ]" value="24" />&nbsp;
+   <input type="checkbox" name="eilposts[ ]" value="25" />&nbsp;
    Exit review<br />
    
-   <input type="checkbox" name="eilposts[ ]" value="25" />&nbsp;
+   <input type="checkbox" name="eilposts[ ]" value="21" />&nbsp;
    Self Assessment Rating<br /><br />
 
    <input type="submit" name="fetch" value="restore posts!" />
