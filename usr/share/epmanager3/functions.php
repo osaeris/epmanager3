@@ -47,7 +47,7 @@
 
     $footerString = '';
     $revision = EP_VERSION;
-    $footerString = $footerString . "<div id='footer'><img src='images/FinalLogoColour.png' alt='dumfries and galloway college logo' /><br />&copy;&nbsp;2007-2015 (Revision $revision)</div>";
+    $footerString = $footerString . "<div id='footer'><img src='images/FinalLogoColour.png' alt='dumfries and galloway college logo' /><br />&copy;&nbsp;2007-2017 (Revision $revision)</div>";
 
     return $footerString;
   }
@@ -454,11 +454,11 @@
        $student=mysqli_real_escape_string($link,$student);
        $query = 'INSERT INTO `ep_student_lecturers` VALUES (\''.$student.'\',\''.$lecturer.'\')';
 
-       mysqli_query($link,$query) or die(mysqli_error($link));
+       mysqli_query($link,$query) or die("failed in check_lecturer_student q1 ".mysqli_error($link) );
 
        $query="INSERT INTO `{$student}_users` VALUES ($maxuservalue, '{$lecturer}', '{$lecturerpass}', '{$lecturer}', '$lecturer@$lecturerdomain', 'http://', NOW(), '', 0, '{$lecturer}');";       
    
-       mysqli_query($link,$query) or die(mysqli_error($link));
+       mysqli_query($link,$query) or die("failed in check_lecturer_student q2 ".mysqli_error($link));
 
        $query="INSERT INTO `{$student}_usermeta` VALUES (NULL,$maxuservalue,'first_name','firstname'),
     (NULL,$maxuservalue,'last_name','surname'),
@@ -469,7 +469,7 @@
     (NULL,$maxuservalue,'admin_color','fresh'),
     (NULL,$maxuservalue,'use_ssl','0'),
     (NULL,$maxuservalue,'show_admin_bar_front','true'),
-    (NULL,$maxuservalue,'{$student}_capabilities','a:1:{s:11:\"contributor\";b:1;}'),
+    (NULL,$maxuservalue,'{$student}_capabilities','a:1:{s:6:\"author\";b:1;}'),
     (NULL,$maxuservalue,'{$student}_user_level','1'),(NULL,$maxuservalue,'dismissed_wp_pointers','wp330_toolbar,wp330_saving_widgets,wp340_choose_image_from_library,wp340_customize_current_theme_link,wp350_media,wp360_revisions,wp360_locks');";
 
        mysqli_query($link,$query) or die(mysqli_error($link));
@@ -1669,14 +1669,14 @@
     $link=dbconnect();
     $existing_warning='';
 
-    $query = "SELECT ep_student_courses.student_id, student_nicename FROM ep_student_courses JOIN ep_students ON ep_student_courses.student_id = ep_students.student_id ";
+    $query = "SELECT ep_student_courses.student_id, student_nicename FROM ep_student_courses JOIN ep_students ON ep_student_courses.student_id = ep_students.student_id " ;
 
     
     $query.= " WHERE course_id = '$coursecode' ";
     if(($courseblock!='')||($courseocc!='')) {
         $query .= " AND course_block='$courseblock' AND course_occurrence='$courseocc' ";
     }
-    $query .= ";";
+    $query .= " ORDER BY student_nicename ;";
 
     $result=mysqli_query($link,$query) or die(mysqli_error($link));
     $num=mysqli_num_rows($result);
