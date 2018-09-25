@@ -126,10 +126,16 @@ if (isset($_POST['action']) && $_POST['action'] == 'submitted')
 
     <?php
 
+    
+
     if (isset($_POST['create']) && $_POST['create'] == 'create lecturer!')
     {
-
-
+      $manylecturers=false;
+      
+      if (strpos($lecturer, ',') !== false) {
+          $lecturerarray = explode(',',$lecturer);
+          $manylecturers = true;
+      }
 
       if ($pagevalid == true)
       {
@@ -137,18 +143,32 @@ if (isset($_POST['action']) && $_POST['action'] == 'submitted')
         
         foreach($_POST['studentlist'] as $student) 
         {
-          //echo "student : $student , lecturer : $lecturer" . "<br />";
-           //check for association first
-           if (check_lecturer_student($lecturer, $student) < 1)
-               add_ep_lecturer($lecturer, $student);
+            //echo "student : $student , lecturer : $lecturer" . "<br />";
+            //check for association first
+            if($manylecturers==true) {
+                foreach($lecturerarray as $lec) {
+                    if (check_lecturer_student($lec, $student) < 1) {
+                        echo "multiple adding $lec to $student<br />";
+                        add_ep_lecturer($lec, $student);
+                    }
+                }
+            }
+            else
+            {
+
+                if (check_lecturer_student($lecturer, $student) < 1) {
+                   echo "adding $lecturer to $student<br />";
+                   add_ep_lecturer($lecturer, $student);
+                }
+            }
         }
 
         echo "<p>Lecturer $lecturer added successfully.</p>";
         echo "<p><a href='addgrouplecturer.php'>&larr;&nbsp;back</a></p>";
       }
     
-
     }
+    
 }
 else 
 {
@@ -163,7 +183,7 @@ else
       <input type="text" name="courseblock" size="2" />
       <input type="text" name="courseocc" size="2" />
 
-      <label for="lecturer">lecturer username (e.g. <b>bloggsj</b>)</label>
+      <label for="lecturer">lecturer username (e.g. <b>bloggsj</b>) or list (e.g. <b>bloggsj,gillespied</b>)</label>
       <input type="text" name="lecturer" /><br />
 
     <input type="submit" name="fetch" value="fetch students!" /><br />    
