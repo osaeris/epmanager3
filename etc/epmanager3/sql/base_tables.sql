@@ -55,7 +55,8 @@ CREATE TABLE IF NOT EXISTS `joebloggs_comments` (
   KEY `comment_post_ID` (`comment_post_ID`),
   KEY `comment_approved_date_gmt` (`comment_approved`,`comment_date_gmt`),
   KEY `comment_date_gmt` (`comment_date_gmt`),
-  KEY `comment_parent` (`comment_parent`)
+  KEY `comment_parent` (`comment_parent`),
+  KEY `comment_author_email` (`comment_author_email`(10))
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
@@ -66,12 +67,12 @@ CREATE TABLE IF NOT EXISTS `joebloggs_comments` (
 
 CREATE TABLE IF NOT EXISTS `joebloggs_options` (
   `option_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `option_name` varchar(64) NOT NULL DEFAULT '',
+  `option_name` varchar(191) NOT NULL DEFAULT '',
   `option_value` longtext NOT NULL,
   `autoload` varchar(20) NOT NULL DEFAULT 'yes',
   PRIMARY KEY (`option_id`),
   UNIQUE KEY `option_name` (`option_name`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=413 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=518 ;
 
 -- --------------------------------------------------------
 
@@ -106,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `joebloggs_posts` (
   `post_status` varchar(20) NOT NULL DEFAULT 'publish',
   `comment_status` varchar(20) NOT NULL DEFAULT 'open',
   `ping_status` varchar(20) NOT NULL DEFAULT 'open',
-  `post_password` varchar(20) NOT NULL DEFAULT '',
+  `post_password` varchar(255) NOT NULL DEFAULT '',
   `post_name` varchar(200) NOT NULL DEFAULT '',
   `to_ping` text NOT NULL,
   `pinged` text NOT NULL,
@@ -124,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `joebloggs_posts` (
   KEY `type_status_date` (`post_type`,`post_status`,`post_date`,`ID`),
   KEY `post_parent` (`post_parent`),
   KEY `post_author` (`post_author`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=10027 ;
+) ENGINE=InnoDB  AUTO_INCREMENT=20181927 DEFAULT CHARSET=utf8 ;
 
 -- --------------------------------------------------------
 
@@ -200,6 +201,10 @@ CREATE TABLE IF NOT EXISTS `joebloggs_uam_accessgroup_to_object` (
   `object_id` varchar(11) NOT NULL,
   `object_type` varchar(255) NOT NULL,
   `group_id` int(11) NOT NULL,
+  `general_object_type` varchar(64) NOT NULL,
+  `group_type` varchar(32) NOT NULL,
+  `from_date` datetime DEFAULT NULL,
+  `to_date` datetime DEFAULT NULL,
   PRIMARY KEY (`object_id`,`object_type`,`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -217,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `joebloggs_usermeta` (
   PRIMARY KEY (`umeta_id`),
   KEY `user_id` (`user_id`),
   KEY `meta_key` (`meta_key`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=29 ;
+) ENGINE=InnoDB  AUTO_INCREMENT=31 DEFAULT CHARSET=utf8 ;
 
 -- --------------------------------------------------------
 
@@ -228,17 +233,18 @@ CREATE TABLE IF NOT EXISTS `joebloggs_usermeta` (
 CREATE TABLE IF NOT EXISTS `joebloggs_users` (
   `ID` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_login` varchar(60) NOT NULL DEFAULT '',
-  `user_pass` varchar(64) NOT NULL DEFAULT '',
+  `user_pass` varchar(255) NOT NULL DEFAULT '',
   `user_nicename` varchar(50) NOT NULL DEFAULT '',
   `user_email` varchar(100) NOT NULL DEFAULT '',
   `user_url` varchar(100) NOT NULL DEFAULT '',
   `user_registered` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `user_activation_key` varchar(60) NOT NULL DEFAULT '',
+  `user_activation_key` varchar(255) NOT NULL DEFAULT '',
   `user_status` int(11) NOT NULL DEFAULT '0',
   `display_name` varchar(250) NOT NULL DEFAULT '',
   PRIMARY KEY (`ID`),
   KEY `user_login_key` (`user_login`),
-  KEY `user_nicename` (`user_nicename`)
+  KEY `user_nicename` (`user_nicename`),
+  KEY `user_email` (`user_email`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
@@ -248,7 +254,7 @@ CREATE TABLE IF NOT EXISTS `joebloggs_users` (
 --
 --  Table structure for termmeta
 --
-
+/*
 CREATE TABLE `joebloggs_termmeta` (
 `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 `term_id` bigint(20) unsigned NOT NULL DEFAULT '0',
@@ -258,4 +264,4 @@ PRIMARY KEY (`meta_id`),
 KEY `term_id` (`term_id`),
 KEY `meta_key` (`meta_key`(191))
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8;
-
+*/
