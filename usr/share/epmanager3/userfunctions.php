@@ -73,15 +73,14 @@ function create_portfolio($student, $lecturer, $adminpass, $courseid, $courseblo
     $queryfilearray=array("joebloggs_uam_accessgroups.sql","joebloggs_uam_accessgroup_to_object.sql","joebloggs_term_taxonomy.sql","joebloggs_terms.sql","joebloggs_term_relationships.sql","joebloggs_postmeta.sql","joebloggs_comments.sql");
     
     foreach($queryfilearray as $queryfile) {
-    
         exec('cat /etc/epmanager3/sql/'.$queryfile.' | sed "{ 
            s/joebloggs/'.$student.'/g 
         }" > /tmp/'.$queryfile);   
-        
+
         exec('mysql -h '.EP_DB_SERVER.' -u'.EP_DB_USERNAME.' -p'.EP_DB_PASSWORD.' '.EP_DB_DATABASE.'  < /tmp/'.$queryfile);    
         
     }
-    
+        $queryfile = 'baseposts.sql';
         exec('cat /etc/epmanager3/sql/base_posts.sql | sed "{ 
            s/joebloggs/'.$student.'/g 
            s/interneteproot/'.$netpath.'/g
