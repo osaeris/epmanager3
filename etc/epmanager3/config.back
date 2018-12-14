@@ -35,9 +35,8 @@ define('STUDENT_DB_PASSWORD', 'databasepassword');// the student records databas
 define('EP_SSO_SALT', 'A long salt value here');// this is the salt value for SSO plugin
 
 // LDAP Login for manager - simply checks if user can bind
-define('MANAGER_LDAP','off'); // Whether the manager uses LDAP for logins
-
-define('MAN_LDAP_SERVER', 'localhost');// Which server will provide LDAP checks
-define('MAN_LDAP_SUFFIX', '@yourdomain.com');// the suffix added to usernames
-
+define('MANAGER_LDAP', 'on');
+define('MAN_LDAP_SERVER', 'ldap');// xxx
+define('MAN_LDAP_FAILOVER_SERVER', 'localhost');// xxx
+define('MAN_LDAP_SUFFIX', '@yourdomain.com');// xxx
 ?>
