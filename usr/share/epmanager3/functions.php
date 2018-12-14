@@ -918,6 +918,7 @@
    $query = $query.$student.'_postmeta,';
    $query = $query.$student.'_posts,';
    $query = $query.$student.'_terms,';
+   $query = $query.$student.'_termmeta,';
    $query = $query.$student.'_term_relationships,';
    $query = $query.$student.'_term_taxonomy,';
    $query = $query.$student.'_uam_accessgroups,';
