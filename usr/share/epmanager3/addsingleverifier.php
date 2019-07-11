@@ -150,7 +150,7 @@ echo "<p><a href='addsingleverifier.php'>&larr;&nbsp;back</a></p>";
         {
            add_ep_verifier($student,$ipcheckverifier,$verifierpass,$verifierdomain);
            echo "$student,$ipcheckverifier,$verifierpass,$verifierdomain";
-           break;
+           exit;
         }
         echo "<p>verifier $ipcheckverifier added to ePortfolio $student</p>";
         echo "<p><a href='addsingleverifier.php'>&larr;&nbsp;back</a></p>";

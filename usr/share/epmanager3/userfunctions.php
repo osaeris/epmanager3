@@ -868,7 +868,6 @@ function get_current_session_long_format() {
          $query = "SELECT term_taxonomy_id, name from $student" . "_term_relationships ";
          $query .= "JOIN $student" . "_terms on $student" . "_terms.term_id = $student" . "_term_relationships.term_taxonomy_id ";
          $query .= " WHERE object_id=$postid limit 1; ";
-//echo $query . "<br />";
          $numstudents = mysqli_query($link,$query) or die("Select get_post_category Failed!");
          $numstudent = mysqli_fetch_array($numstudents);
 
